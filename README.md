@@ -1,5 +1,8 @@
 # Warehouse Layout Advisor
 
+> [!WARNING]
+> 本项目是一份未完工的废案，不具备任何实际价值，仅供参考。请勿将其用于生产环境、商业决策或任何真实业务场景。
+
 Warehouse Layout Advisor is a full-stack decision-support WebUI for warehouse
 layout analysis. A conversational agent clarifies business goals, translates
 them into structured analysis conditions, runs an evaluation workflow, and
