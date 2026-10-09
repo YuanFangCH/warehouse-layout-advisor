@@ -1,84 +1,80 @@
-# Warehouse Layout Advisor
+# 仓储布局决策参谋
 
 > [!WARNING]
 > 项目状态：已废弃的未完成原型。
 > 本项目不具备实际使用价值，仅供查阅和参考，请勿用于生产或商业决策。
 
-Warehouse Layout Advisor is a full-stack decision-support WebUI for warehouse
-layout analysis. A conversational agent clarifies business goals, translates
-them into structured analysis conditions, runs an evaluation workflow, and
-presents traceable evidence, recommendations, and version history.
+这是一个面向仓储布局分析的全栈决策支持 WebUI 原型。系统通过对话澄清业务
+目标，将需求转换为结构化分析条件，执行评估流程，并展示可追溯的证据、推荐
+结果和版本记录。
 
-The frontend handles interaction and visualization. The FastAPI backend owns
-the workflow state, business rules, versioning, persistence, and model gateway.
-The evaluation model is an interchangeable backend service and defaults to a
-deterministic mock gateway.
+前端负责交互和可视化，FastAPI 后端负责工作流状态、业务规则、版本管理、
+持久化和模型网关。评估模型作为可替换的后端服务接入，默认使用确定性的
+Mock 网关，不需要外部网络。
 
-## Features
+## 功能
 
-- Multi-turn clarification for scope, priorities, budget, performance floor,
-  risk preference, and analysis period.
-- Scenario versioning with optimistic concurrency checks.
-- Background evaluation workflow with Server-Sent Events progress updates.
-- Evidence, KPI, insight, recommendation, approval, and revision views.
-- OpenAI-compatible chat-completions gateway with an offline mock fallback.
-- SQLite persistence with automatic schema creation and demo seed data.
+- 多轮澄清改造范围、优先级、预算、性能底线、风险偏好和分析周期。
+- 使用场景版本和乐观并发检查，避免条件覆盖。
+- 在后台线程执行评估，并通过 Server-Sent Events 推送进度。
+- 展示证据、KPI、洞察、推荐、采纳和重算结果。
+- 支持 OpenAI 兼容的 Chat Completions 接口，也支持离线 Mock 模式。
+- 使用 SQLite 持久化，首次启动自动建表并写入演示数据。
 
-## Architecture
+## 目录结构
 
 ```text
 frontend/
-  src/api/             HTTP and SSE clients
-  src/components/      Shared interaction and analysis components
-  src/features/        Scenario version comparison
-  src/pages/           Project dashboard and scenario workbench
-  src/stores/          Cross-component UI state
-  tests/               Vitest and Testing Library tests
+  src/api/             HTTP 与 SSE 客户端
+  src/components/      通用交互与分析组件
+  src/features/        场景版本对比
+  src/pages/           项目总览与场景工作台
+  src/stores/          跨组件 UI 状态
+  tests/               Vitest 与 Testing Library 测试
 
 backend/
-  app/api/             FastAPI routes
-  app/domain/          Clarification, translation, explanation, recommendation
-  app/orchestration/   Evaluation jobs, workflow runner, event publishing
-  app/adapters/        Mock and OpenAI-compatible model gateways
-  app/models/          Pydantic schemas, ORM entities, enums
-  app/persistence/     SQLite engine, repositories, migrations
-  tests/               Pytest integration and workflow tests
+  app/api/             FastAPI 路由
+  app/domain/          澄清、翻译、解释与推荐服务
+  app/orchestration/   评估任务、工作流与事件发布
+  app/adapters/        Mock 与 OpenAI 兼容模型网关
+  app/models/          Pydantic Schema、ORM 实体与枚举
+  app/persistence/     SQLite、Repository 与迁移
+  tests/               Pytest 集成测试与工作流测试
 ```
 
-## Requirements
+## 环境要求
 
-- Python 3.11 or newer
-- Node.js 18 or newer
-- npm 9 or newer
+- Python 3.11 或更高版本
+- Node.js 18 或更高版本
+- npm 9 或更高版本
 
-## Backend
+## 启动后端
 
-Install dependencies:
+安装依赖：
 
 ```powershell
 cd backend
 python -m pip install -r requirements.txt
 ```
 
-Start the API:
+启动 API：
 
 ```powershell
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-From the repository root, the equivalent command is:
+也可以从仓库根目录启动：
 
 ```powershell
 $env:PYTHONPATH='backend'
 python -m uvicorn app.main:app --port 8000
 ```
 
-The API is available at `http://127.0.0.1:8000`, and its health endpoint is
-`GET /api/health`.
+API 地址为 `http://127.0.0.1:8000`，健康检查接口为 `GET /api/health`。
 
-## Frontend
+## 启动前端
 
-Install dependencies and start the development server:
+安装依赖并启动开发服务器：
 
 ```powershell
 cd frontend
@@ -86,17 +82,17 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`. Vite proxies `/api` to
-`http://127.0.0.1:8000`.
+打开 `http://127.0.0.1:5173`。Vite 会将 `/api` 代理到
+`http://127.0.0.1:8000`。
 
-To use a different API origin, set `VITE_API_BASE_URL` before starting Vite.
+如需访问其他 API 地址，请在启动 Vite 前设置 `VITE_API_BASE_URL`。
 
-## Model Configuration
+## 模型配置
 
-The backend uses the built-in mock gateway when `OPENCODE_API_KEY` is empty.
-That mode is deterministic and requires no network access.
+未设置 `OPENCODE_API_KEY` 时，后端使用内置 Mock 网关。该模式结果确定，
+不依赖外部网络。
 
-To use an OpenAI-compatible Chat Completions endpoint, set:
+如需接入 OpenAI 兼容的 Chat Completions 接口，请设置：
 
 ```powershell
 $env:OPENCODE_API_KEY='your-api-key'
@@ -105,19 +101,19 @@ $env:OPENCODE_MODEL='deepseek-v4-flash'
 $env:OPENCODE_FORCE_IPV4='1'
 ```
 
-Values are read from environment variables only. Never commit a real key.
-See `backend/.env.example` for the supported names.
+所有配置只从环境变量读取，不要提交真实密钥。变量名称参见
+`backend/.env.example`。
 
-## Tests
+## 测试
 
-Backend:
+后端测试：
 
 ```powershell
 $env:PYTHONPATH='backend'
 python -m pytest backend/tests -q
 ```
 
-Frontend:
+前端测试与构建：
 
 ```powershell
 cd frontend
@@ -125,7 +121,7 @@ npm test
 npm run build
 ```
 
-## API Overview
+## API 概览
 
 ```text
 GET    /api/health
@@ -159,7 +155,7 @@ POST   /api/scenarios/{scenario_id}/approve
 POST   /api/scenarios/{scenario_id}/revise
 ```
 
-Errors use a consistent response shape:
+错误响应使用统一结构：
 
 ```json
 {
@@ -174,16 +170,15 @@ Errors use a consistent response shape:
 }
 ```
 
-## Data Storage
+## 数据存储
 
-SQLite is used for local persistence. The default database is created at
-`backend/data/warehouse_decision.db` on first startup. It stores projects,
-scenarios, messages, clarifications, evaluation runs, evidence,
-recommendations, versions, and audit events.
+本项目使用 SQLite 做本地持久化。首次启动时会在
+`backend/data/warehouse_decision.db` 自动创建数据库，保存项目、场景、
+消息、澄清问题、评估任务、证据、推荐结果、版本记录和审计事件。
 
-The database is runtime state and is ignored by Git. Set `WAREHOUSE_DB_PATH`
-to use a different location.
+数据库属于运行时数据，不会提交到 Git。可以通过 `WAREHOUSE_DB_PATH`
+修改存储位置。
 
-## License
+## 许可证
 
 MIT
